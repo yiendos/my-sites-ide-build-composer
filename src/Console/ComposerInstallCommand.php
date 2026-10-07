@@ -22,7 +22,7 @@ class ComposerInstallCommand extends Command
     {
         $this
             ->setName('build:composer-install')
-            ->setDescription("Install a site's composer dependencies (Repos/<site>/Sites)")
+            ->setDescription("Install a site's composer dependencies (Repos/<site>/<IDE_APP_DIR>)")
             ->addArgument('site', InputArgument::REQUIRED, 'Which site, as in Repos/<site>')
         ;
     }
@@ -49,7 +49,7 @@ class ComposerInstallCommand extends Command
         $site = $input->getArgument('site');
 
         if (!$this->siteHasComposerJson($site)) {
-            $io->warning("Repos/{$site}/Sites/composer.json doesn't exist - nothing to install.");
+            $io->warning('Repos/' . $this->siteApp($site) . "/composer.json doesn't exist - nothing to install.");
             return Command::SUCCESS;
         }
 
