@@ -38,8 +38,8 @@ class ComposerRunCommand extends Command
     {
         $site = $input->getArgument('site');
 
-        if (!is_dir((getenv('IDE_ROOT') ?: getcwd()) . "/Repos/{$site}/Sites")) {
-            $io->error("Repos/{$site}/Sites doesn't exist.");
+        if (!is_dir($this->sitePath($site))) {
+            $io->error('Repos/' . $this->siteApp($site) . " doesn't exist - is IDE_APP_DIR right for this site?");
             return Command::FAILURE;
         }
 

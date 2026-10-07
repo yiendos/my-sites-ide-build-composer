@@ -52,8 +52,8 @@ The image is built from the same `Dockerfile`, so an existing `${NAMESPACE}_comp
 
 ```
 host (my-sites-ide CLI)
-  |- build:composer-install <site>       --> docker compose run --rm composer --working-dir=<site>/Sites install ...
-  |- build:composer-run <site> -- ...    --> docker compose run --rm composer --working-dir=<site>/Sites ...
+  |- build:composer-install <site>       --> docker compose run --rm composer --working-dir=<site>/<IDE_APP_DIR> install ...
+  |- build:composer-run <site> -- ...    --> docker compose run --rm composer --working-dir=<site>/<IDE_APP_DIR> ...
   |- ide:repo-clone --laravel            --> site-dependencies hook --> build:composer-install <site>
 
 composer container (removed after each run)
@@ -69,10 +69,10 @@ The container runs as `composer`, a system user made in the `Dockerfile`, on the
 
 | Command | What it does |
 |---|---|
-| `build:composer-install <site>` | `composer install` in `Repos/<site>/Sites`, in two passes: first without scripts or the autoloader, then with both - a fresh Laravel site's scripts need `vendor/` complete first. Platform requirements are ignored, because the composer image's PHP isn't the one fpm runs your site with. Skips a site with no `composer.json` |
-| `build:composer-run <site> -- <arguments>` | Any composer command in `Repos/<site>/Sites`, e.g. `build:composer-run example -- require laravel/sanctum` or `build:composer-run example -- update --ignore-platform-reqs`. Put composer's arguments after `--`, or the CLI takes their options as its own |
+| `build:composer-install <site>` | `composer install` in `Repos/<site>/<IDE_APP_DIR>`, in two passes: first without scripts or the autoloader, then with both - a fresh Laravel site's scripts need `vendor/` complete first. Platform requirements are ignored, because the composer image's PHP isn't the one fpm runs your site with. Skips a site with no `composer.json` |
+| `build:composer-run <site> -- <arguments>` | Any composer command in `Repos/<site>/<IDE_APP_DIR>`, e.g. `build:composer-run example -- require laravel/sanctum` or `build:composer-run example -- update --ignore-platform-reqs`. Put composer's arguments after `--`, or the CLI takes their options as its own |
 
-There's nothing to configure - the plugin has no `.env` settings.
+There's nothing of its own to configure. It works in each site's application folder, `Repos/<site>/<IDE_APP_DIR>` - an IDE setting in the root `.env`, `deploy` by default (`Sites` for the older layout, `.` for the repository root).
 
 ## What it uses from the IDE
 
@@ -80,6 +80,7 @@ There's nothing to configure - the plugin has no `.env` settings.
 |---|---|
 | `NAMESPACE` (root `.env`) | the image name, `${NAMESPACE}_composer` |
 | `IDE_ROOT` (set by the CLI and `_dev/cache/ide.env`) | the `Repos/` and `Packages/` mounts, finding `Repos/<site>` |
+| `IDE_APP_DIR` (root `.env`, set by the CLI - `deploy` if it isn't) | which folder in `Repos/<site>/` holds the app - where composer runs |
 | `storage/plugins/composer/` (`"storage": true`) | Composer's cache, mounted at `/storage` |
 | the `site-dependencies` hook | installing on `ide:repo-clone --laravel` |
 
