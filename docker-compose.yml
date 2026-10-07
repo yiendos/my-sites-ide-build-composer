@@ -1,0 +1,18 @@
+services:
+    composer:
+        container_name: "composer"
+        image: ${NAMESPACE}_composer:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            # storage/plugins/composer/ on the host (storage: true in composer.json) - the
+            # container is run with --rm, so the cache would otherwise go with it every time
+            COMPOSER_CACHE_DIR: /storage/cache
+        volumes:
+            - '${IDE_ROOT}/Repos:/opt/repos'
+            # for sites whose composer.json has a path repository into Packages/
+            - '${IDE_ROOT}/Packages:/opt/Packages'
+
+    # not started by `ide:spark` (autostart: false) - it's a tool, each build:composer-*
+    # command runs it once with `docker compose run --rm composer`

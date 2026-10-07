@@ -1,0 +1,32 @@
+{
+    "name": "yiendos/my-sites-ide-build-composer",
+    "description": "Composer in a container - installs your sites' PHP dependencies without PHP or Composer on the host - for my-sites-ide",
+    "type": "my-sites-ide-plugin",
+    "license": "MIT",
+    "keywords": ["my-sites-ide", "composer", "php", "dependencies"],
+    "authors": [
+        {
+            "name": "Paul Yiend",
+            "email": "yiendos@sbmatrix.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Yiendos\\MySitesIde\\Build\\Composer\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "symfony/console": "^7.3"
+    },
+    "extra": {
+        "my-sites-ide": {
+            "commands": "src/Console",
+            "compose": "docker-compose.yml",
+            "services": ["composer"],
+            "autostart": false,
+            "storage": true,
+            "hooks": { "site-dependencies": ["build:composer-install"] }
+        }
+    }
+}
