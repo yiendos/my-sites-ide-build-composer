@@ -65,6 +65,12 @@ composer container (removed after each run)
 The container runs as `composer`, a system user made in the `Dockerfile`, on the official
 `composer` image.
 
+The image adds one PHP extension, `opentelemetry`, for sites using OpenTelemetry tracing (see the
+[php plugin](https://github.com/yiendos/my-sites-ide-preprocessors-php#tracing-with-opentelemetry)):
+Composer won't install the Laravel instrumentation package without it, and Laravel's
+`package:discover` stops when it's missing. Nothing is traced from this container. After updating
+the plugin, rebuild the image once with `docker compose build composer`.
+
 ## Command reference
 
 | Command | What it does |
@@ -88,6 +94,9 @@ There's nothing of its own to configure. It works in each site's application fol
 
 **`Your requirements could not be resolved` about `php` or `ext-*`.** `build:composer-install`
 already ignores platform requirements. With `build:composer-run`, add `--ignore-platform-reqs`.
+
+**`The opentelemetry extension must be loaded` from `package:discover`.** The image predates the
+extension - `docker compose build composer`.
 
 **`Cannot create cache directory /storage/cache`.** Composer carries on without a cache. On Linux
 hosts the container's `composer` user may not be able to write to `storage/plugins/composer/` -
